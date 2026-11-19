@@ -45,7 +45,7 @@
     .ms-logo-icon svg { width: 100%; height: 100%; }
 
     /* Mobile sidebar */
-    #mobileMenuBtn { display: none; }
+    #mobileMenuBtn { }
     #sidebarOverlay { display: none; position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,0.5); }
 #sidebarOverlay.visible { display: block; }
     #mobileSidebar { display: none; position: fixed; top: 0; left: 0; width: 280px; height: 100vh; z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; }
@@ -115,7 +115,7 @@
   <div id="sidebarOverlay" class="hidden" onclick="closeMobileSidebar()"></div>
 
   <!-- Mobile Menu Button (hamburger) -->
-  <button id="mobileMenuBtn" class="md:hidden fixed top-4 left-4 z-60 bg-ms-navy text-white p-3 rounded-lg shadow-lg hover:bg-ms-blue transition">
+  <button id="mobileMenuBtn" class="fixed top-4 left-4 z-60 bg-ms-navy text-white p-3 rounded-lg shadow-lg hover:bg-ms-blue transition">
     <i class="fas fa-bars text-xl"></i>
   </button>
 
@@ -214,13 +214,12 @@
     <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
       <div>
         <h2 id="pageTitle" class="text-lg font-semibold text-ms-dark">Dashboard</h2>
-        <p class="text-xs text-gray-500">Last updated: Today, 2:45 PM</p>
       </div>
       <div class="flex items-center gap-4">
         <button class="relative text-gray-500 hover:text-ms-navy"><i class="fas fa-bell"></i><span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span></button>
         <div class="text-right">
-          <div class="text-sm font-medium text-gray-500">Net Worth</div>
-          <div class="text-lg font-semibold text-ms-navy">$100,000.00</div>
+          <div class="text-sm font-medium text-gray-500">Total Assets</div>
+          <div class="text-lg font-semibold text-ms-navy" id="totalAssetsDisplay">$100,000,000.00</div>
         </div>
       </div>
     </header>
@@ -236,7 +235,7 @@ const data = {
   user: {
     name: "Dave Grohl",
     email: "dave@morgan.com",
-    netWorth: 40000001.45,
+    netWorth: 100000000,
     changeToday: 342.50,
     changePct: 0.34
   },
@@ -370,7 +369,7 @@ function renderDashboard() {
       </div>
       <div class="card rounded-xl p-6">
         <div class="text-sm text-gray-500">Invested Assets</div>
-        <div class="text-2xl font-semibold mt-1 text-ms-dark">${formatCurrency(40000001.45)}</div>
+        <div class="text-2xl font-semibold mt-1 text-ms-dark">${formatCurrency(100000000)}</div>
       </div>
       <div class="card rounded-xl p-6">
         <div class="text-sm text-gray-500">Cash Available</div>
