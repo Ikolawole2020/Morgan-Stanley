@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Morgan Stanley — Client Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -43,9 +43,29 @@
       justify-content: center;
     }
     .ms-logo-icon svg { width: 100%; height: 100%; }
+
+    /* Mobile sidebar */
+    #mobileMenuBtn { display: none; }
+    #sidebarOverlay { display: none; position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,0.5); }
+#sidebarOverlay.visible { display: block; }
+    #mobileSidebar { display: none; position: fixed; top: 0; left: 0; width: 280px; height: 100vh; z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; }
+    #mobileSidebar.open { transform: translateX(0); }
+
+    @media (max-width: 768px) {
+      #mobileMenuBtn { display: block; }
+      #app main { margin-left: 0 !important; }
+      .grid-cols-4, .grid-cols-3, .grid-cols-2 { grid-template-columns: repeat(1, 1fr) !important; }
+      table { font-size: 12px; }
+      table th, table td { padding: 8px 4px !important; }
+      .p-8 { padding: 1rem !important; }
+      .px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
+      .text-4xl { font-size: 2rem !important; }
+      .text-3xl { font-size: 1.5rem !important; }
+      .text-2xl { font-size: 1.25rem !important; }
+    }
   </style>
 </head>
-<body class="bg-ms-lightgray text-ms-dark min-h-screen">
+<body class="bg-ms-lightgray text-ms-dark min-h-screen overflow-x-hidden">
 
 <!-- LOGIN SCREEN -->
 <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-white">
@@ -68,11 +88,11 @@
       <form id="loginForm" class="space-y-5">
         <div>
           <label class="block text-sm text-gray-500 mb-1.5">Email or User ID</label>
-          <input type="text" id="loginEmail" value="dave@morgan.com" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-ms-dark focus:outline-none focus:border-ms-blue focus:ring-1 focus:ring-ms-blue">
+          <input type="text" id="loginEmail" placeholder="Email or User ID" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-ms-dark focus:outline-none focus:border-ms-blue focus:ring-1 focus:ring-ms-blue">
         </div>
         <div>
           <label class="block text-sm text-gray-500 mb-1.5">Password</label>
-          <input type="password" id="loginPassword" value="davegrohl@" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-ms-dark focus:outline-none focus:border-ms-blue focus:ring-1 focus:ring-ms-blue">
+          <input type="password" id="loginPassword" placeholder="Password" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-3 text-ms-dark focus:outline-none focus:border-ms-blue focus:ring-1 focus:ring-ms-blue">
         </div>
         <button type="submit" class="w-full bg-ms-navy hover:bg-ms-blue transition rounded-lg py-3 font-medium text-white">Sign In</button>
       </form>
@@ -80,7 +100,7 @@
         <a href="#" class="text-xs text-ms-blue hover:underline">Forgot Password?</a>
         <a href="#" class="text-xs text-ms-blue hover:underline">Register</a>
       </div>
-      <p class="text-center text-xs text-gray-400 mt-6">Demo credentials pre-filled.</p>
+      <p class="text-center text-xs text-gray-400 mt-6">Secure login.</p>
     </div>
     <div class="text-center mt-8">
       <p class="text-xs text-gray-400">© 2026 Morgan Stanley. All rights reserved.</p>
@@ -91,8 +111,16 @@
 
 <!-- MAIN APP -->
 <div id="app" class="hidden flex min-h-screen">
-  <!-- Sidebar -->
-  <aside class="w-64 bg-ms-navy border-r border-ms-navy flex flex-col shrink-0">
+  <!-- Mobile Menu Overlay -->
+  <div id="sidebarOverlay" class="hidden" onclick="closeMobileSidebar()"></div>
+
+  <!-- Mobile Menu Button (hamburger) -->
+  <button id="mobileMenuBtn" class="md:hidden fixed top-4 left-4 z-60 bg-ms-navy text-white p-3 rounded-lg shadow-lg hover:bg-ms-blue transition">
+    <i class="fas fa-bars text-xl"></i>
+  </button>
+
+  <!-- Desktop Sidebar -->
+  <aside class="hidden md:flex w-64 bg-ms-navy border-r border-ms-navy flex flex-col shrink-0">
     <div class="p-6 border-b border-white/10">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 ms-logo-icon">
@@ -135,8 +163,53 @@
     </div>
   </aside>
 
+  <!-- Mobile Sidebar -->
+  <div id="mobileSidebar" class="hidden bg-ms-navy text-white">
+    <div class="p-6 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 ms-logo-icon">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 2 L21 13 L32 18 L21 23 L18 34 L15 23 L4 18 L15 13 Z" fill="white" stroke="white" stroke-width="0.3"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-semibold text-sm text-white">Morgan Stanley</div>
+          <div class="text-xs text-blue-200/60">Wealth Management</div>
+        </div>
+      </div>
+      <button onclick="closeMobileSidebar()" class="text-white hover:text-blue-200"><i class="fas fa-times text-xl"></i></button>
+    </div>
+    <nav class="flex-1 p-4 space-y-1 text-sm">
+      <a href="#" data-page="dashboard" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-home w-5"></i> Dashboard</a>
+      <a href="#" data-page="portfolio" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-chart-pie w-5"></i> Portfolio</a>
+      <a href="#" data-page="holdings" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-list w-5"></i> Holdings</a>
+      <a href="#" data-page="transactions" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-exchange-alt w-5"></i> Activity</a>
+      <a href="#" data-page="performance" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-chart-line w-5"></i> Performance</a>
+      <a href="#" data-page="documents" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-file-alt w-5"></i> Documents</a>
+      <a href="#" data-page="goals" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-bullseye w-5"></i> Goals</a>
+      <a href="#" data-page="messages" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-comment-dots w-5"></i> Messages</a>
+      <a href="#" data-page="cash" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-wallet w-5"></i> Cash & Spending</a>
+      <a href="#" data-page="accounts" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-bank w-5"></i> Accounts</a>
+      <a href="#" data-page="trade" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-exchange-alt w-5"></i> Trade</a>
+      <a href="#" data-page="transfers" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-money-bill-wave w-5"></i> Transfers</a>
+      <a href="#" data-page="billpay" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-clipboard-list w-5"></i> Bill Pay</a>
+      <a href="#" data-page="watchlist" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-star w-5"></i> Watchlist</a>
+      <a href="#" data-page="profile" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-100/80" onclick="closeMobileSidebar()"><i class="fas fa-user-cog w-5"></i> Profile</a>
+    </nav>
+    <div class="p-4 border-t border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-ms-blue flex items-center justify-center font-medium text-sm text-white">DG</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-medium truncate text-white">Dave Grohl</div>
+          <div class="text-xs text-blue-200/60">Premium Client</div>
+        </div>
+        <button id="logoutBtnMobile" class="text-blue-200/60 hover:text-white"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+  </div>
+
   <!-- Main Content -->
-  <main class="flex-1 overflow-auto">
+  <main class="flex-1 overflow-auto relative">
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
       <div>
@@ -163,7 +236,7 @@ const data = {
   user: {
     name: "Dave Grohl",
     email: "dave@morgan.com",
-    netWorth: 100000,
+    netWorth: 40000001.45,
     changeToday: 342.50,
     changePct: 0.34
   },
@@ -297,7 +370,7 @@ function renderDashboard() {
       </div>
       <div class="card rounded-xl p-6">
         <div class="text-sm text-gray-500">Invested Assets</div>
-        <div class="text-2xl font-semibold mt-1 text-ms-dark">${formatCurrency(95000)}</div>
+        <div class="text-2xl font-semibold mt-1 text-ms-dark">${formatCurrency(40000001.45)}</div>
       </div>
       <div class="card rounded-xl p-6">
         <div class="text-sm text-gray-500">Cash Available</div>
@@ -622,7 +695,12 @@ function renderTransfers() {
               <div class="md:col-span-2"><label class="block text-xs text-gray-500 mb-1">Amount ($)</label><input type="number" placeholder="0.00" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm text-ms-dark"></div>
               <div class="md:col-span-2"><label class="block text-xs text-gray-500 mb-1">Memo (optional)</label><input type="text" placeholder="Transfer memo" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm text-ms-dark"></div>
               <div class="md:col-span-2"><label class="block text-xs text-gray-500 mb-1">Transfer Date</label><input type="date" class="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm text-ms-dark"></div>
-              <button class="w-full bg-ms-navy text-white py-3 rounded-lg font-medium hover:bg-ms-blue transition">Review Transfer</button>
+              <div class="md:col-span-2">
+                <button onclick="openWithdrawModal()" class="w-full bg-ms-navy text-white py-3 rounded-lg font-medium hover:bg-ms-blue transition">Review Transfer</button>
+              </div>
+              <div class="md:col-span-2">
+                <button onclick="processDeposit()" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-500 transition">Deposit Funds</button>
+              </div>
             </div>
           </div>
         </div>
@@ -659,16 +737,16 @@ function renderBillPay() {
           <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
             <div class="text-xs text-gray-500 uppercase font-medium mb-3">Quick Pay</div>
             <div class="space-y-3">
-              <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"><div><div class="font-medium text-sm text-ms-dark">Mortgage Payment</div><div class="text-xs text-gray-500">Due Dec 1 · $2,850.00</div></div><button class="text-xs text-ms-blue hover:underline font-medium">Pay Now</button></div>
-              <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"><div><div class="font-medium text-sm text-ms-dark">Electric Utility</div><div class="text-xs text-gray-500">Due Nov 25 · $142.50</div></div><button class="text-xs text-ms-blue hover:underline font-medium">Pay Now</button></div>
-              <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"><div><div class="font-medium text-sm text-ms-dark">Credit Card</div><div class="text-xs text-gray-500">Due Nov 30 · $1,245.30</div></div><button class="text-xs text-ms-blue hover:underline font-medium">Pay Now</button></div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"><div><div class="font-medium text-sm text-ms-dark">Mortgage Payment</div><div class="text-xs text-gray-500">Due Dec 1 · $2,850.00</div></div><button onclick="openWithdrawModal()" class="text-xs text-ms-blue hover:underline font-medium">Pay Now</button></div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"><div><div class="font-medium text-sm text-ms-dark">Electric Utility</div><div class="text-xs text-gray-500">Due Nov 25 · $142.50</div></div><button onclick="openWithdrawModal()" class="text-xs text-ms-blue hover:underline font-medium">Pay Now</button></div>
+              <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"><div><div class="font-medium text-sm text-ms-dark">Credit Card</div><div class="text-xs text-gray-500">Due Nov 30 · $1,245.30</div></div><button onclick="openWithdrawModal()" class="text-xs text-ms-blue hover:underline font-medium">Pay Now</button></div>
             </div>
           </div>
         </div>
         <div class="overflow-hidden rounded-lg border border-gray-200">
           <table class="w-full text-sm">
             <thead class="bg-gray-50 text-gray-500"><tr><th class="px-4 py-3 text-left text-xs font-medium">Payee</th><th class="px-4 py-3 text-left text-xs font-medium">Due Date</th><th class="px-4 py-3 text-right text-xs font-medium">Amount</th><th class="px-4 py-3 text-left text-xs font-medium">Status</th><th class="px-4 py-3 text-right text-xs font-medium">Action</th></tr></thead>
-            <tbody>${data.bills.map(b => `<tr class="border-t border-gray-100"><td class="px-4 py-3 font-medium text-ms-dark">${b.name}</td><td class="px-4 py-3 text-gray-500">${b.due}</td><td class="px-4 py-3 text-right font-medium text-gray-700">$${b.amount.toLocaleString()}</td><td class="px-4 py-3"><span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600 capitalize">${b.status}</span></td><td class="px-4 py-3 text-right"><button class="text-xs text-ms-blue hover:underline">Pay</button></td></tr>`).join('')}</tbody>
+            <tbody>${data.bills.map(b => `<tr class="border-t border-gray-100"><td class="px-4 py-3 font-medium text-ms-dark">${b.name}</td><td class="px-4 py-3 text-gray-500">${b.due}</td><td class="px-4 py-3 text-right font-medium text-gray-700">$${b.amount.toLocaleString()}</td><td class="px-4 py-3"><span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600 capitalize">${b.status}</span></td><td class="px-4 py-3 text-right"><button onclick="openWithdrawModal()" class="text-xs text-ms-blue hover:underline">Pay</button></td></tr>`).join('')}</tbody>
           </table>
         </div>
       </div>
@@ -775,6 +853,31 @@ function renderCharts() {
 }
 
 // Event listeners
+function openMobileSidebar() {
+  document.getElementById('mobileSidebar').classList.remove('hidden');
+  document.getElementById('sidebarOverlay').classList.remove('hidden');
+  document.getElementById('sidebarOverlay').classList.add('visible');
+  document.getElementById('mobileSidebar').classList.add('open');
+}
+
+function closeMobileSidebar() {
+  document.getElementById('mobileSidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+  setTimeout(() => {
+    document.getElementById('mobileSidebar').classList.add('hidden');
+    document.getElementById('sidebarOverlay').classList.add('hidden');
+  }, 300);
+}
+
+document.getElementById('mobileMenuBtn').addEventListener('click', openMobileSidebar);
+
+// Logout mobile button
+document.getElementById('logoutBtnMobile').addEventListener('click', () => {
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  closeMobileSidebar();
+});
+
 document.getElementById('loginForm').addEventListener('submit', (e) => {
   e.preventDefault();
   document.getElementById('loginScreen').classList.add('hidden');
@@ -793,6 +896,47 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
     showPage(link.dataset.page);
   });
 });
+</script>
+<!-- Unable to Withdraw Modal -->
+<div id="withdrawModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeWithdrawModal()"></div>
+  <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl border border-gray-200">
+    <div class="flex items-center justify-center mb-6">
+      <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+        <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+      </div>
+    </div>
+    <h3 class="text-lg font-semibold text-ms-dark mb-2 text-center">Transaction Declined</h3>
+    <p class="text-gray-600 text-center mb-8">Unable to withdraw funds. Please check your available balance and try again.</p>
+    <button onclick="closeWithdrawModal()" class="w-full bg-ms-navy text-white py-3 rounded-lg font-medium hover:bg-ms-blue transition">OK</button>
+  </div>
+</div>
+
+<script>
+  function closeWithdrawModal() {
+    document.getElementById('withdrawModal').classList.add('hidden');
+  }
+
+  function openWithdrawModal() {
+    document.getElementById('withdrawModal').classList.remove('hidden');
+  }
+
+  function processDeposit() {
+    const amount = parseFloat(document.querySelector('input[type="number"]').value);
+    if (amount && amount > 0) {
+      // Deposit successful - add to checking account
+      const checking = data.accounts.find(a => a.type === 'Checking');
+      if (checking) {
+        checking.balance += amount;
+        checking.available += amount;
+      }
+      alert(`Deposit of $${amount.toLocaleString()} processed successfully to your Checking account.`);
+      // Refresh current page
+      showPage('transfers');
+    } else {
+      alert('Please enter a valid deposit amount.');
+    }
+  }
 </script>
 </body>
 </html>
