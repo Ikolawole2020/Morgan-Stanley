@@ -29,6 +29,9 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Inter', system-ui, sans-serif; }
     .sidebar-link.active { background: rgba(255,255,255,0.12); color: #ffffff; border-left: 3px solid #187ABA; }
+.bottom-nav-item.active { color: #003087; }
+.bottom-nav-item.active .fas { color: #003087; }
+#app main { padding-bottom: 80px; }
     .sidebar-link:hover { background: rgba(255,255,255,0.08); }
     .card { background: #ffffff; border: 1px solid #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .positive { color: #16a34a; }
@@ -114,10 +117,24 @@
   <!-- Mobile Menu Overlay -->
   <div id="sidebarOverlay" class="hidden" onclick="closeMobileSidebar()"></div>
 
-  <!-- Mobile Menu Button (hamburger) -->
-  <button id="mobileMenuBtn" class="fixed top-4 left-4 z-60 bg-ms-navy text-white p-3 rounded-lg shadow-lg hover:bg-ms-blue transition">
-    <i class="fas fa-bars text-xl"></i>
-  </button>
+  <!-- Bottom Navigation Bar -->
+  <div id="bottomNav" class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex justify-around items-center py-2 px-4 shadow-lg md:hidden">
+    <a href="#" data-page="dashboard" class="bottom-nav-item active flex flex-col items-center justify-center gap-1 text-ms-navy" onclick="showPage('dashboard'); closeMobileSidebar()">
+      <i class="fas fa-home text-sm"></i><span class="text-xs font-medium">Dashboard</span>
+    </a>
+    <a href="#" data-page="accounts" class="bottom-nav-item flex flex-col items-center justify-center gap-1 text-gray-500" onclick="showPage('accounts'); closeMobileSidebar()">
+      <i class="fas fa-bank text-sm"></i><span class="text-xs font-medium">Accounts</span>
+    </a>
+    <a href="#" data-page="transfers" class="bottom-nav-item flex flex-col items-center justify-center gap-1 text-gray-500" onclick="showPage('transfers'); closeMobileSidebar()">
+      <i class="fas fa-money-bill-wave text-sm"></i><span class="text-xs font-medium">Transfers</span>
+    </a>
+    <a href="#" data-page="watchlist" class="bottom-nav-item flex flex-col items-center justify-center gap-1 text-gray-500" onclick="showPage('watchlist'); closeMobileSidebar()">
+      <i class="fas fa-star text-sm"></i><span class="text-xs font-medium">Watchlist</span>
+    </a>
+    <a href="#" data-page="profile" class="bottom-nav-item flex flex-col items-center justify-center gap-1 text-gray-500" onclick="showPage('profile'); closeMobileSidebar()">
+      <i class="fas fa-user-cog text-sm"></i><span class="text-xs font-medium">Profile</span>
+    </a>
+  </div>
 
   <!-- Desktop Sidebar -->
   <aside class="hidden md:flex w-64 bg-ms-navy border-r border-ms-navy flex flex-col shrink-0">
@@ -219,7 +236,7 @@
         <button class="relative text-gray-500 hover:text-ms-navy"><i class="fas fa-bell"></i><span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span></button>
         <div class="text-right">
           <div class="text-sm font-medium text-gray-500">Total Assets</div>
-          <div class="text-lg font-semibold text-ms-navy" id="totalAssetsDisplay">$100,000,000.00</div>
+          <div class="text-lg font-semibold text-ms-navy" id="totalAssetsDisplay">$40,000,000.46</div>
         </div>
       </div>
     </header>
@@ -235,7 +252,7 @@ const data = {
   user: {
     name: "Dave Grohl",
     email: "dave@morgan.com",
-    netWorth: 100000000,
+    netWorth: 40000000.46,
     changeToday: 342.50,
     changePct: 0.34
   },
@@ -369,7 +386,7 @@ function renderDashboard() {
       </div>
       <div class="card rounded-xl p-6">
         <div class="text-sm text-gray-500">Invested Assets</div>
-        <div class="text-2xl font-semibold mt-1 text-ms-dark">${formatCurrency(100000000)}</div>
+        <div class="text-2xl font-semibold mt-1 text-ms-dark">${formatCurrency(40000000.46)}</div>
       </div>
       <div class="card rounded-xl p-6">
         <div class="text-sm text-gray-500">Cash Available</div>
@@ -868,9 +885,6 @@ function closeMobileSidebar() {
   }, 300);
 }
 
-document.getElementById('mobileMenuBtn').addEventListener('click', openMobileSidebar);
-
-// Logout mobile button
 document.getElementById('logoutBtnMobile').addEventListener('click', () => {
   document.getElementById('app').classList.add('hidden');
   document.getElementById('loginScreen').classList.remove('hidden');
@@ -879,6 +893,12 @@ document.getElementById('logoutBtnMobile').addEventListener('click', () => {
 
 document.getElementById('loginForm').addEventListener('submit', (e) => {
   e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+  if (!email || !password) {
+    alert('Please enter both email and password.');
+    return;
+  }
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   showPage('dashboard');
